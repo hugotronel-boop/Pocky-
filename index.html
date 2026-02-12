@@ -7,6 +7,63 @@
 </head>
 <body>
 
+<!-- ÉCRAN PIN -->
+<div id="pinScreen" style="
+    position:fixed; 
+    inset:0; 
+    background: linear-gradient(180deg, #0b0c1a, #0d1b3a); 
+    z-index:1000; 
+    display:flex; 
+    flex-direction:column; 
+    justify-content:center; 
+    align-items:center; 
+    gap:24px;
+    color:white;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    padding: 0 20px;    /* ← ajoute du padding horizontal pour ne pas coller aux bords */
+    box-sizing: border-box; /* ← pour que le padding soit inclus dans la taille */
+">
+  <!-- TITRE -->
+  <h1 style="margin:0; font-size:48px; font-weight:700;">POCKY</h1>
+  <h3 style="margin:0; font-weight:400; font-size:18px; color:rgba(255,255,255,0.7);">GÈRE TON ARGENT</h3>
+
+  <!-- INPUT PIN -->
+  <input id="pinInput" 
+         type="tel" 
+         inputmode="numeric" 
+         pattern="[0-9]*" 
+         maxlength="4" 
+         style="
+           font-size:32px; 
+           padding:16px; 
+           width:140px; 
+           max-width:80%;   /* ← limite la largeur sur petits écrans */
+           text-align:center; 
+           border-radius:12px; 
+           border:none; 
+           background:#111; 
+           color:white;
+         ">
+
+  <!-- BOUTON OK -->
+  <button onclick="checkPin()" 
+          style="
+            padding:16px 40px; 
+            font-size:20px; 
+            border:none; 
+            border-radius:12px; 
+            background:#7b61ff; 
+            color:white; 
+            cursor:pointer; 
+            box-shadow:0 8px 20px rgba(123,97,255,0.4);
+            transition: transform 0.1s;
+          "
+          onmouseover="this.style.transform='scale(1.05)';" 
+          onmouseout="this.style.transform='scale(1)';">
+    Valider
+  </button>
+</div>
+
   <!-- CANVAS BULLES -->
   <canvas id="bubbles"></canvas>
   <div class="background-gradient"></div>
@@ -506,7 +563,35 @@ button:hover {
   display: flex;
   gap: 10px;
   align-items: center;
-}</style><script>// ------------------------------------------------------------
+}</style><script>// ===== GESTION DU PIN =====
+const PIN_KEY = 'budgetAppPin';
+
+function checkPin() {
+  const input = document.getElementById('pinInput').value;
+  const storedPin = localStorage.getItem(PIN_KEY);
+
+  if (!storedPin) {
+    // Premier lancement : on enregistre le PIN
+    if (/^\d{4}$/.test(input)) {
+      localStorage.setItem(PIN_KEY, input);
+      document.getElementById('pinScreen').style.display = 'none';
+      window.onload(); // lance ton init normal
+    } else {
+      alert('Le PIN doit contenir 4 chiffres.');
+    }
+  } else {
+    // Vérification du PIN existant
+    if (input === storedPin) {
+      document.getElementById('pinScreen').style.display = 'none';
+      window.onload(); // lance ton init normal
+    } else {
+      alert('Code incorrect !');
+      document.getElementById('pinInput').value = '';
+    }
+  }
+}
+
+// ------------------------------------------------------------
 //  ÉTAT GLOBAL FUSIONNÉ
 // ------------------------------------------------------------
 const state = {
@@ -946,10 +1031,14 @@ renderMenu = function() {
 // ------------------------------------------------------------
 //  INIT
 // ------------------------------------------------------------
-window.onload = ()=>{
-  loadState();      // <-- AJOUT : restauration des données
-  showPage('menu');
-  globalRender();
+// window.onload reste vide ou juste pour setup léger
+window.onload = () => {
+  const storedPin = localStorage.getItem(PIN_KEY);
+  if (!storedPin) {
+    document.getElementById('pinScreen').style.display = 'flex';
+  } else {
+    document.getElementById('pinScreen').style.display = 'flex';
+  }
 };
 
 // exposition globale
