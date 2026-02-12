@@ -575,7 +575,7 @@ function checkPin() {
     if (/^\d{4}$/.test(input)) {
       localStorage.setItem(PIN_KEY, input);
       document.getElementById('pinScreen').style.display = 'none';
-      window.onload(); // lance ton init normal
+      initApp(); // <-- nouvelle fonction pour lancer ton appli
     } else {
       alert('Le PIN doit contenir 4 chiffres.');
     }
@@ -583,12 +583,18 @@ function checkPin() {
     // Vérification du PIN existant
     if (input === storedPin) {
       document.getElementById('pinScreen').style.display = 'none';
-      window.onload(); // lance ton init normal
+      initApp();
     } else {
       alert('Code incorrect !');
       document.getElementById('pinInput').value = '';
     }
   }
+}
+
+function initApp() {
+  loadState();
+  showPage('menu');
+  globalRender();
 }
 
 // ------------------------------------------------------------
@@ -1034,11 +1040,7 @@ renderMenu = function() {
 // window.onload reste vide ou juste pour setup léger
 window.onload = () => {
   const storedPin = localStorage.getItem(PIN_KEY);
-  if (!storedPin) {
-    document.getElementById('pinScreen').style.display = 'flex';
-  } else {
-    document.getElementById('pinScreen').style.display = 'flex';
-  }
+  document.getElementById('pinScreen').style.display = 'flex';
 };
 
 // exposition globale
